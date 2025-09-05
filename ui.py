@@ -144,7 +144,7 @@ def build_interface() -> gr.Blocks:
                     配置参数为只读模式，只能通过以下方式修改：
                     
                     **1. 直接编辑配置文件：**
-                    - 文件路径：`telegram_config.json`
+                    - 文件路径：`docker-compose.yml`
                     - 修改后重启应用即可生效
                     
                     **2. 环境变量配置：**
@@ -163,7 +163,7 @@ def build_interface() -> gr.Blocks:
                     **方法一（推荐）:** 使用聊天机器人
                     1. 点击 "🤖 启动聊天机器人" 按钮
                     2. 向机器人发送任意消息（如"你好"）
-                    3. Chat ID 会自动获取并保存到配置文件
+                    3. Chat ID 会自动获取并保存到配置文件`docker-compose.yml`
                     
                     **方法二（手动）:** 通过 API
                     1. 将机器人添加到群组或私聊

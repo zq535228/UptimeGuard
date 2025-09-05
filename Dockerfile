@@ -21,7 +21,6 @@ COPY status_check.py .
 # 复制配置文件和依赖
 COPY requirements.txt .
 COPY sites.json .
-COPY telegram_config.json .
 
 # 创建必要的目录
 RUN mkdir -p /app/logs

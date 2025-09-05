@@ -94,7 +94,6 @@ UptimeGuard/
 ├── log_manager.py           # 日志管理
 ├── docker_utils.py          # Docker 环境检测
 ├── sites.json               # 监控站点配置
-├── telegram_config.json     # Telegram 配置
 ├── requirements.txt         # Python 依赖
 ├── logs/                    # 日志文件目录
 │   └── uptime.log          # 监控日志
@@ -115,7 +114,7 @@ UptimeGuard/
 ```
 
 ### Telegram 通知配置
-在 `telegram_config.json` 中配置 Telegram 通知：
+在 `docker-compose.yml` 中配置 Telegram 通知：
 ```json
 {
   "enabled": true,
@@ -188,7 +187,6 @@ docker run -d \
   --name uptimeguard \
   -p 7863:7863 \
   -v $(pwd)/sites.json:/app/sites.json \
-  -v $(pwd)/telegram_config.json:/app/telegram_config.json \
   -v $(pwd)/logs:/app/logs \
   uptimeguard
 ```

@@ -181,7 +181,7 @@ def start_chat_bot():
     
     if not bot_token:
         print("❌ 错误: 未找到 Telegram Bot Token")
-        print("请先在 telegram_config.json 中配置 bot_token")
+        print("请先在 docker-compose.yml 中配置 bot_token")
         return
     
     # 获取机器人信息

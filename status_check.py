@@ -62,7 +62,6 @@ def check_application_status():
     print("📁 配置文件状态:")
     files_to_check = [
         "sites.json",
-        "telegram_config.json",
         "logs/uptime.log"
     ]
     
