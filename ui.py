@@ -56,7 +56,7 @@ def build_interface() -> gr.Blocks:
     with gr.Blocks(title="UptimeGuard", css=custom_css) as demo:
         gr.Markdown("""
         # UptimeGuard
-        ⚡ 实时监控 | 智能告警 | 简单易用 - 让网站监控变得简单
+        ⚡ 实时监控 | 智能告警 | 简单易用 - 让网站监控变得简单 [UptimeGuard](https://github.com/zq535228/UptimeGuard)
         """)
 
         with gr.Column():
