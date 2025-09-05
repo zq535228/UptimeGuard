@@ -7,6 +7,7 @@ app.py
 from ui import build_interface
 from storage import load_sites
 from monitor import start_background_polling
+from docker_utils import is_docker_environment
 
 
 def main():
@@ -15,8 +16,24 @@ def main():
 
     # 启动 UI
     demo = build_interface()
-    # share=True 便于远程演示，可按需关闭
-    demo.launch()
+    
+    # 根据环境设置端口
+    if is_docker_environment():
+        server_port = 7863
+        print("🐳 检测到 Docker 环境，使用端口: 7863")
+    else:
+        server_port = 7864
+        print("💻 检测到本地环境，使用端口: 7864")
+    
+    # 启动 Gradio 应用，传递端口配置
+    demo.launch(
+        server_name="0.0.0.0",  # 允许外部访问
+        server_port=server_port, # 使用不同端口避免冲突
+        share=False,            # 不创建公共链接
+        debug=True,             # 开启调试模式
+        show_error=True,        # 显示错误信息
+        quiet=False             # 显示启动信息
+    )
 
 
 if __name__ == "__main__":

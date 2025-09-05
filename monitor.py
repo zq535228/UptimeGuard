@@ -22,11 +22,6 @@ from typing import Dict, List, Any
 from log_manager import get_log_manager
 from telegram_notifier import send_site_down_alert, send_site_recovery_alert
 from telegram_config import get_failure_threshold, is_telegram_configured
-from notification_tracker import (
-    should_send_down_notification, 
-    should_send_recovery_notification,
-    update_notification_state
-)
 
 
 # 日志文件路径
@@ -84,15 +79,16 @@ def check_ssl_certificate(url: str) -> Dict[str, Any]:
         return {"ssl_status": "down", "ssl_error": f"SSL检查异常: {str(e)}"}
 
 
-def real_check(url: str) -> Dict[str, Any]:
+def real_check(url: str, keywords: List[str] = None) -> Dict[str, Any]:
     """
     真实的网站检查，包括 HTTP 状态、响应时间、SSL 证书等。
+    如果提供了关键词列表，将根据关键词判断网站状态。
     返回完整的检查结果字典。
     """
     start_time = time.time()
     error_message = None
     http_status = 0
-    html_keyword = "unknown"
+    html_keyword = "-"
     
     try:
         # 设置请求头，模拟真实浏览器
@@ -120,17 +116,24 @@ def real_check(url: str) -> Dict[str, Any]:
         # 获取 HTTP 状态码
         http_status = response.status_code
         
-        # 检查响应内容中的关键字（简单检查是否包含常见成功标识）
+        # 检查响应内容中的关键字
         content = response.text.lower()
-        if any(keyword in content for keyword in ['success', 'ok', '正常', '在线', 'running']):
-            html_keyword = "success"
-        elif any(keyword in content for keyword in ['error', '404', '500', '维护', 'maintenance']):
-            html_keyword = "error"
-        else:
-            html_keyword = "unknown"
         
-        # 判断网站是否可用（HTTP 状态码 200-399 通常表示成功）
-        is_up = 200 <= http_status < 400
+        # 如果提供了关键词列表，使用关键词判断状态
+        if keywords:
+            # 检查是否包含任何指定的关键词
+            keyword_found = any(keyword.lower() in content for keyword in keywords)
+            if keyword_found:
+                html_keyword = "success"
+                is_up = True  # 找到关键词则认为成功
+            else:
+                html_keyword = "error"
+                is_up = False  # 没找到关键词则认为失败
+        else:
+            html_keyword = "-"
+            
+            # 判断网站是否可用（HTTP 状态码 200-399 通常表示成功）
+            is_up = 200 <= http_status < 400
         
     except requests.exceptions.Timeout:
         latency_ms = int((time.time() - start_time) * 1000)
@@ -185,8 +188,9 @@ def poll_once(sites: List[Dict[str, Any]]) -> None:
     for site in sites:
         url = site.get("url", "")
         name = site.get("name", "")
+        keywords = site.get("keywords", [])  # 获取关键词列表
         
-        result = real_check(url)
+        result = real_check(url, keywords)
 
         # 更新状态快照
         previous = latest_status_snapshot.get(url, {})
@@ -231,10 +235,10 @@ def poll_once(sites: List[Dict[str, Any]]) -> None:
         log_line = " ".join(log_parts)
         write_log_line(log_line)
         
-        # Telegram 通知逻辑（使用去重功能）
+        # Telegram 通知逻辑（简化版本，无去重功能）
         if is_telegram_configured():
-            # 检查是否需要发送故障警报
-            if should_send_down_notification(url, result["status"], new_failures, failure_threshold):
+            # 发送故障警报（当连续失败次数达到阈值时，但限制在阈值+3次内）
+            if result["status"] == "down" and new_failures >= failure_threshold and new_failures <= failure_threshold + 3:
                 try:
                     send_site_down_alert(
                         site_name=name,
@@ -242,33 +246,21 @@ def poll_once(sites: List[Dict[str, Any]]) -> None:
                         consecutive_failures=new_failures,
                         error_info=error_info if error_info != 'None' else None
                     )
-                    # 更新通知状态
-                    update_notification_state(url, "down", new_failures)
                     write_log_line(f"[TELEGRAM] 发送故障警报: {name} ({url}) - 连续失败 {new_failures} 次")
                 except Exception as e:
                     write_log_line(f"[TELEGRAM ERROR] 发送故障警报失败: {str(e)}")
             
-            # 检查是否需要发送恢复通知
-            elif should_send_recovery_notification(url, result["status"], previous_status, previous_failures, failure_threshold):
+            # 发送恢复通知（当从故障状态恢复到正常状态时）
+            elif result["status"] == "up" and previous_status == "down" and previous_failures >= failure_threshold:
                 try:
                     send_site_recovery_alert(
                         site_name=name,
                         site_url=url,
                         latency_ms=result["latency_ms"]
                     )
-                    # 更新通知状态
-                    update_notification_state(url, "up", 0)
                     write_log_line(f"[TELEGRAM] 发送恢复通知: {name} ({url}) - 响应延迟 {result['latency_ms']} ms")
                 except Exception as e:
                     write_log_line(f"[TELEGRAM ERROR] 发送恢复通知失败: {str(e)}")
-            
-            # 如果状态没有变化，也更新通知状态（用于跟踪）
-            elif result["status"] == "down" and new_failures > 0:
-                # 故障状态持续，更新连续失败次数
-                update_notification_state(url, "down", new_failures)
-            elif result["status"] == "up":
-                # 正常状态，重置连续失败次数
-                update_notification_state(url, "up", 0)
 
 
 def start_background_polling(get_sites_callable, interval_seconds: int = 30) -> threading.Thread:

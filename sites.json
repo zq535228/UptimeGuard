@@ -1,62 +1,71 @@
 [
     {
-        "name": "百度",
-        "url": "https://www.baidu.com"
+        "name": "检验大叔官网",
+        "url": "https://www.jianyandashu.com",
+        "keywords": ["检验大叔", "jianyandashu", "html", "body"]
     },
     {
-        "name": "腾讯网",
-        "url": "https://www.qq.com"
+        "name": "AI检验大叔",
+        "url": "https://ai.jianyandashu.com"
     },
     {
-        "name": "新浪新闻",
-        "url": "https://www.sina.com.cn"
+        "name": "AIAPI",
+        "url": "https://ai-api.jianyandashu.com"
     },
     {
-        "name": "搜狐",
-        "url": "https://www.sohu.com"
+        "name": "电子记录",
+        "url": "https://f.jianyandashu.com"
     },
     {
-        "name": "网易",
-        "url": "https://www.163.com"
+        "name": "电子记录 API",
+        "url": "https://f-api.jianyandashu.com"
     },
     {
-        "name": "哔哩哔哩",
-        "url": "https://www.bilibili.com"
+        "name": "检验科HR助手",
+        "url": "https://hr.jianyandashu.com"
     },
     {
-        "name": "知乎",
-        "url": "https://www.zhihu.com"
+        "name": "检验大叔图库",
+        "url": "https://image.jianyandashu.com"
     },
     {
-        "name": "京东",
-        "url": "https://www.jd.com"
+        "name": "检验大叔图库",
+        "url": "https://tu.jianyandashu.com"
     },
     {
-        "name": "淘宝",
-        "url": "https://www.taobao.com"
+        "name": "检验大叔 uptime",
+        "url": "https://uptime.jianyandashu.com"
     },
     {
-        "name": "必应中国",
-        "url": "https://cn.bing.com"
+        "name": "AIAPI牛广华",
+        "url": "https://ai-api.niuguanghua.com"
     },
     {
-        "name": "人民网",
-        "url": "https://www.people.com.cn"
+        "name": "AIAPI尚雪松",
+        "url": "https://ai-api.shangxuesong.com"
     },
     {
-        "name": "新华网",
-        "url": "https://www.xinhuanet.com"
+        "name": "尚雪松实验室",
+        "url": "https://lab.shangxuesong.com"
     },
     {
-        "name": "央视网",
-        "url": "https://www.cctv.com"
+        "name": "牛广华",
+        "url": "https://www.niuguanghua.com"
     },
     {
-        "name": "澎湃新闻",
-        "url": "https://www.thepaper.cn"
+        "name": "忍者",
+        "url": "https://www.renzhe.org/1/update.xml"
     },
     {
-        "name": "36氪",
-        "url": "https://36kr.com"
+        "name": "Crawl4AI_PY",
+        "url": "https://Crawl4AI.renzhe.org/"
+    },
+    {
+        "name": "尚雪松官网",
+        "url": "https://www.shangxuesong.com"
+    },
+    {
+        "name": "800800",
+        "url": "https://800800.win/"
     }
 ]

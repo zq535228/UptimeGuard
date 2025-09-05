@@ -16,7 +16,6 @@ from log_manager import get_log_manager
 from telegram_config import load_config, update_config, is_telegram_configured
 from telegram_notifier import test_telegram_connection
 from telegram_chat_bot import start_chat_bot, test_chat_bot
-from notification_tracker import get_notification_tracker
 
 
 def _sites_to_table_rows(sites: List[Dict[str, Any]]) -> List[List[Any]]:
@@ -57,7 +56,7 @@ def build_interface() -> gr.Blocks:
     with gr.Blocks(title="UptimeGuard", css=custom_css) as demo:
         gr.Markdown("""
         # UptimeGuard
-        仅用 Python + Gradio 的简单网站在线状态监控示例。下方展示站点列表与日志信息。
+        ⚡ 实时监控 | 智能告警 | 简单易用 - 让网站监控变得简单
         """)
 
         with gr.Column():
@@ -180,9 +179,6 @@ def build_interface() -> gr.Blocks:
                         lines=2
                     )
                     
-                    with gr.Row():
-                        clear_notification_state_btn = gr.Button("🧹 清除通知状态", variant="secondary")
-                        view_notification_state_btn = gr.Button("👁️ 查看通知状态", variant="secondary")
 
         # 回调：刷新日志（优先显示新增队列，其次显示历史）
         def on_refresh_logs():
@@ -292,56 +288,6 @@ def build_interface() -> gr.Blocks:
             outputs=[config_status]
         )
         
-        # 通知状态管理回调函数
-        def clear_all_notification_states():
-            """清除所有通知状态"""
-            try:
-                tracker = get_notification_tracker()
-                states = tracker.get_all_states()
-                for site_url in states.keys():
-                    tracker.clear_site_state(site_url)
-                return f"🧹 已清除 {len(states)} 个站点的通知状态"
-            except Exception as e:
-                return f"❌ 清除通知状态失败: {str(e)}"
-        
-        def view_notification_states():
-            """查看当前通知状态"""
-            try:
-                tracker = get_notification_tracker()
-                states = tracker.get_all_states()
-                
-                if not states:
-                    return "📭 当前没有通知状态记录"
-                
-                result = "📊 当前通知状态:\n\n"
-                for site_url, state in states.items():
-                    status = state.get("status", "unknown")
-                    failures = state.get("consecutive_failures", 0)
-                    timestamp = state.get("timestamp", 0)
-                    time_str = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(timestamp)) if timestamp else "未知"
-                    
-                    status_emoji = "🔴" if status == "down" else "🟢" if status == "up" else "⚪"
-                    result += f"{status_emoji} {site_url}\n"
-                    result += f"   状态: {status}\n"
-                    result += f"   连续失败: {failures} 次\n"
-                    result += f"   最后通知: {time_str}\n\n"
-                
-                return result
-            except Exception as e:
-                return f"❌ 查看通知状态失败: {str(e)}"
-        
-        # 绑定通知状态管理按钮
-        clear_notification_state_btn.click(
-            fn=clear_all_notification_states,
-            inputs=[],
-            outputs=[config_status]
-        )
-        
-        view_notification_state_btn.click(
-            fn=view_notification_states,
-            inputs=[],
-            outputs=[config_status]
-        )
 
         # 周期刷新表格以显示最新快照（每 5 秒）
         def refresh_table():

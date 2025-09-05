@@ -8,7 +8,6 @@ storage.py
 import json
 import os
 from typing import List, Dict, Any
-from notification_tracker import clear_site_state
 
 
 # 数据文件路径常量，集中管理，便于其他模块引用
@@ -71,22 +70,8 @@ def delete_site(index: int) -> List[Dict[str, Any]]:
     """按索引删除站点，返回最新列表。"""
     sites = load_sites()
     if 0 <= index < len(sites):
-        # 获取要删除的站点URL，用于清除通知状态
-        site_to_delete = sites[index]
-        site_url = site_to_delete.get("url", "")
-        
         # 删除站点
         del sites[index]
         save_sites(sites)
-        
-        # 清除该站点的通知状态
-        if site_url:
-            try:
-                clear_site_state(site_url)
-                print(f"🧹 已清除站点 {site_url} 的通知状态")
-            except Exception as e:
-                print(f"⚠️ 清除站点 {site_url} 通知状态失败: {str(e)}")
     
     return sites
-
-
