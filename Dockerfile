@@ -20,8 +20,8 @@ COPY telegram_chat_bot.py .
 COPY requirements.txt .
 COPY sites.json .
 
-# 创建必要的目录
-RUN mkdir -p /app/logs
+# 创建必要的目录并设置权限
+RUN mkdir -p /app/logs && chmod 777 /app/logs
 
 # 设置 Python 路径，确保可以找到当前目录的模块
 ENV PYTHONPATH=/app

@@ -9,7 +9,7 @@ import requests
 import time
 import json
 from typing import Optional, Dict, Any
-from telegram_config import load_config, update_config
+from telegram_config import load_config
 
 
 def get_bot_info(bot_token: str) -> Optional[Dict[str, Any]]:
@@ -229,18 +229,13 @@ def start_chat_bot():
                 if "message" in update:
                     chat_id = process_message(update, bot_token)
                     
-                    # 如果成功获取到 chat_id 且未保存过，则保存到配置
+                    # 如果成功获取到 chat_id 且未保存过，则显示配置信息
                     if chat_id and chat_id not in saved_chat_ids:
-                        print(f"💾 保存聊天 ID: {chat_id}")
-                        
-                        # 更新配置
-                        new_config = update_config(chat_id=chat_id, enabled=True)
-                        
-                        if new_config.get("chat_id") == chat_id:
-                            print("✅ 聊天 ID 已成功保存到配置文件中")
-                            saved_chat_ids.add(chat_id)
-                        else:
-                            print("❌ 保存聊天 ID 失败")
+                        print(f"💾 获取到聊天 ID: {chat_id}")
+                        print("⚠️  注意：配置现在只能通过环境变量设置")
+                        print(f"   请设置环境变量: TELEGRAM_CHAT_ID={chat_id}")
+                        print(f"   并设置: TELEGRAM_ENABLED=true")
+                        saved_chat_ids.add(chat_id)
             
             # 如果没有新消息，等待一下再继续
             if not updates:

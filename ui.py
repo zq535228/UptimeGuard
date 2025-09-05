@@ -13,7 +13,7 @@ from docker_utils import is_docker_environment
 from storage import load_sites
 from monitor import latest_status_snapshot, LOG_FILE_PATH
 from log_manager import get_log_manager
-from telegram_config import load_config, update_config, is_telegram_configured
+from telegram_config import load_config, is_telegram_configured
 from telegram_notifier import test_telegram_connection
 from telegram_chat_bot import start_chat_bot, test_chat_bot
 
@@ -56,7 +56,7 @@ def build_interface() -> gr.Blocks:
     with gr.Blocks(title="UptimeGuard", css=custom_css) as demo:
         gr.Markdown("""
         # UptimeGuard
-        ⚡ 实时监控 | 智能告警 | 简单易用 - 让网站监控变得简单 [UptimeGuard](https://github.com/zq535228/UptimeGuard)
+        ⚡ 实时监控 | 智能告警 | 简单易用 - 让网站监控变得简单 [GitHub 源代码](https://github.com/zq535228/UptimeGuard)
         """)
 
         with gr.Column():
@@ -84,7 +84,14 @@ def build_interface() -> gr.Blocks:
                     autoscroll=True
                 )
                 with gr.Row():
-                    refresh_logs_btn = gr.Button("刷新日志")
+                    refresh_logs_btn = gr.Button("🔄 刷新日志")
+                    cleanup_logs_btn = gr.Button("🧹 清理旧日志", variant="secondary")
+                cleanup_status = gr.Textbox(
+                    value="",
+                    label="清理状态",
+                    interactive=False,
+                    visible=False
+                )
 
         # Telegram 配置区域
         with gr.Accordion("🔔 Telegram 通知配置", open=False):
@@ -194,23 +201,32 @@ def build_interface() -> gr.Blocks:
             outputs=[log_box]
         )
 
+        # 回调：清理旧日志
+        def on_cleanup_logs():
+            manager = get_log_manager(LOG_FILE_PATH)
+            result = manager.cleanup_logs_now()
+            # 清理后刷新日志显示
+            return manager.get_history_text(200), result
+
+        cleanup_logs_btn.click(
+            fn=on_cleanup_logs,
+            inputs=[],
+            outputs=[log_box, cleanup_status]
+        )
+
         # Telegram 配置回调函数
         def test_telegram_config(enabled, token, chat_id, threshold):
             """测试 Telegram 连接"""
-            if not enabled:
-                return "⚠️ 请先启用 Telegram 通知"
-            if not token or not chat_id:
-                return "❌ 请先填写 Bot Token 和 Chat ID"
+            # 注意：由于配置现在只能通过环境变量设置，
+            # 这里只能测试当前环境变量中的配置
+            config = load_config()
+            
+            if not config.get("enabled"):
+                return "⚠️ 请先通过环境变量设置 TELEGRAM_ENABLED=true"
+            if not config.get("bot_token") or not config.get("chat_id"):
+                return "❌ 请先通过环境变量设置 TELEGRAM_BOT_TOKEN 和 TELEGRAM_CHAT_ID"
             
             try:
-                # 临时更新配置进行测试
-                update_config(
-                    bot_token=token,
-                    chat_id=chat_id,
-                    enabled=True,
-                    failure_threshold=int(threshold)
-                )
-                
                 if test_telegram_connection():
                     return "✅ 测试成功！已收到测试消息"
                 else:
@@ -220,16 +236,16 @@ def build_interface() -> gr.Blocks:
 
         def reset_telegram_config():
             """重置 Telegram 配置"""
-            try:
-                update_config(
-                    bot_token="",
-                    chat_id="",
-                    enabled=False,
-                    failure_threshold=10
-                )
-                return False, "", "", 10, "🔄 配置已重置"
-            except Exception as e:
-                return False, "", "", 10, f"❌ 重置失败: {str(e)}"
+            # 注意：由于配置现在只能通过环境变量设置，
+            # 重置功能已不可用，只能显示当前配置状态
+            config = load_config()
+            return (
+                config.get("enabled", False),
+                config.get("bot_token", ""),
+                config.get("chat_id", ""),
+                config.get("failure_threshold", 10),
+                "⚠️ 配置现在只能通过环境变量设置，无法在界面中重置"
+            )
 
         # 绑定回调函数
         test_connection_btn.click(

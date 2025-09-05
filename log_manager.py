@@ -9,7 +9,8 @@ log_manager.py
 from __future__ import annotations
 
 import os
-from datetime import datetime
+import time
+from datetime import datetime, timedelta
 from queue import Queue
 from typing import List, Optional
 
@@ -27,6 +28,9 @@ class LogManager:
         self.max_log_history = max_log_history
         self.log_queue: Queue[str] = Queue()
         self.log_history: List[str] = []
+        self.last_cleanup_time = 0  # 上次清理时间（时间戳）
+        self.cleanup_interval = 3600  # 清理间隔：1小时（秒）
+        self.log_retention_days = 3  # 日志保留天数
 
         # 确保目录存在
         os.makedirs(os.path.dirname(self.log_file_path), exist_ok=True)
@@ -36,7 +40,8 @@ class LogManager:
 
     def log_message(self, message: str) -> None:
         """记录日志消息（写入队列、历史与文件，并控制台输出）。"""
-        timestamp = datetime.now().strftime("%H:%M:%S")
+        # 使用完整的日期时间格式，便于日志清理
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         log_entry = f"[{timestamp}] {message}"
 
         # 添加到队列（用于实时显示）
@@ -52,6 +57,12 @@ class LogManager:
         # 写入日志文件
         self._write_log_to_file(log_entry)
 
+        # 定期清理旧日志（每小时检查一次）
+        current_time = time.time()
+        if current_time - self.last_cleanup_time > self.cleanup_interval:
+            self._cleanup_old_logs_by_time()
+            self.last_cleanup_time = current_time
+
         # 控制台输出
         print(log_entry)
 
@@ -62,6 +73,72 @@ class LogManager:
                 f.write(log_entry + '\n')
         except Exception as e:
             print(f"写入日志文件失败: {e}")
+
+    def _cleanup_old_logs_by_time(self) -> None:
+        """基于时间清理旧日志，只保留指定天数内的日志。"""
+        try:
+            if not os.path.exists(self.log_file_path):
+                return
+                
+            # 计算保留的截止时间
+            cutoff_time = datetime.now() - timedelta(days=self.log_retention_days)
+            cutoff_timestamp = cutoff_time.timestamp()
+            
+            # 读取所有日志行
+            with open(self.log_file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            if not lines:
+                return
+                
+            # 过滤出需要保留的日志行
+            kept_lines = []
+            removed_count = 0
+            
+            for line in lines:
+                # 尝试从日志行中提取时间戳
+                if self._should_keep_log_line(line, cutoff_timestamp):
+                    kept_lines.append(line)
+                else:
+                    removed_count += 1
+            
+            # 如果删除了日志，重写文件
+            if removed_count > 0:
+                with open(self.log_file_path, 'w', encoding='utf-8') as f:
+                    f.writelines(kept_lines)
+                print(f"🧹 日志清理完成：删除了 {removed_count} 行旧日志，保留了 {len(kept_lines)} 行")
+                
+        except Exception as e:
+            print(f"清理日志文件失败: {e}")
+
+    def _should_keep_log_line(self, line: str, cutoff_timestamp: float) -> bool:
+        """判断日志行是否应该保留（基于时间戳）。"""
+        try:
+            # 日志格式：[时间戳] 消息内容
+            # 例如：[2025-09-05 05:42:37] name=检验大叔官网 url=https://www.jianyandashu.com status=up
+            if line.startswith('[') and ']' in line:
+                # 提取时间戳部分
+                timestamp_str = line[1:line.index(']')]
+                
+                # 尝试解析时间戳
+                if ' ' in timestamp_str and ':' in timestamp_str:
+                    # 格式：2025-09-05 05:42:37
+                    try:
+                        log_time = datetime.strptime(timestamp_str, "%Y-%m-%d %H:%M:%S")
+                        return log_time.timestamp() >= cutoff_timestamp
+                    except ValueError:
+                        pass
+                elif ':' in timestamp_str:
+                    # 格式：05:42:37（只有时间，没有日期）
+                    # 对于这种格式，我们假设是今天的日志，直接保留
+                    return True
+                    
+            # 如果无法解析时间戳，保留该行（避免误删重要日志）
+            return True
+            
+        except Exception:
+            # 解析失败时保留该行
+            return True
 
     def _cleanup_old_logs(self) -> None:
         """清理过旧的日志文件内容（超过 5000 行则截断为后 2500 行）。"""
@@ -90,6 +167,44 @@ class LogManager:
         if n is None:
             n = self.max_log_history
         return "\n".join(self.log_history[-n:]) + "\n"
+
+    def cleanup_logs_now(self) -> str:
+        """立即执行日志清理，返回清理结果信息。"""
+        try:
+            if not os.path.exists(self.log_file_path):
+                return "日志文件不存在"
+                
+            # 计算保留的截止时间
+            cutoff_time = datetime.now() - timedelta(days=self.log_retention_days)
+            cutoff_timestamp = cutoff_time.timestamp()
+            
+            # 读取所有日志行
+            with open(self.log_file_path, 'r', encoding='utf-8') as f:
+                lines = f.readlines()
+            
+            if not lines:
+                return "日志文件为空"
+                
+            # 过滤出需要保留的日志行
+            kept_lines = []
+            removed_count = 0
+            
+            for line in lines:
+                if self._should_keep_log_line(line, cutoff_timestamp):
+                    kept_lines.append(line)
+                else:
+                    removed_count += 1
+            
+            # 如果删除了日志，重写文件
+            if removed_count > 0:
+                with open(self.log_file_path, 'w', encoding='utf-8') as f:
+                    f.writelines(kept_lines)
+                return f"🧹 日志清理完成：删除了 {removed_count} 行旧日志，保留了 {len(kept_lines)} 行"
+            else:
+                return f"📝 日志文件正常，共 {len(kept_lines)} 行，无需清理"
+                
+        except Exception as e:
+            return f"❌ 清理日志失败: {str(e)}"
 
 
 _singleton: Optional[LogManager] = None
