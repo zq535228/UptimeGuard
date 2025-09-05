@@ -1,0 +1,77 @@
+{
+  "https://www.baidu.com": {
+    "status": "up",
+    "timestamp": 1757045462.248656,
+    "consecutive_failures": 0
+  },
+  "https://www.qq.com": {
+    "status": "up",
+    "timestamp": 1757045463.0943544,
+    "consecutive_failures": 0
+  },
+  "https://www.sina.com.cn": {
+    "status": "up",
+    "timestamp": 1757045464.5053434,
+    "consecutive_failures": 0
+  },
+  "https://www.sohu.com": {
+    "status": "up",
+    "timestamp": 1757045465.8915951,
+    "consecutive_failures": 0
+  },
+  "https://www.163.com": {
+    "status": "up",
+    "timestamp": 1757045466.4408956,
+    "consecutive_failures": 0
+  },
+  "https://www.bilibili.com": {
+    "status": "up",
+    "timestamp": 1757045467.2432117,
+    "consecutive_failures": 0
+  },
+  "https://www.zhihu.com": {
+    "status": "up",
+    "timestamp": 1757045467.8740394,
+    "consecutive_failures": 0
+  },
+  "https://www.jd.com": {
+    "status": "up",
+    "timestamp": 1757045468.873282,
+    "consecutive_failures": 0
+  },
+  "https://www.taobao.com": {
+    "status": "up",
+    "timestamp": 1757045469.5478635,
+    "consecutive_failures": 0
+  },
+  "https://cn.bing.com": {
+    "status": "up",
+    "timestamp": 1757045469.8680112,
+    "consecutive_failures": 0
+  },
+  "https://www.people.com.cn": {
+    "status": "up",
+    "timestamp": 1757045470.19278,
+    "consecutive_failures": 0
+  },
+  "https://www.xinhuanet.com": {
+    "status": "up",
+    "timestamp": 1757045471.5399065,
+    "consecutive_failures": 0
+  },
+  "https://www.cctv.com": {
+    "status": "up",
+    "timestamp": 1757045471.9135933,
+    "consecutive_failures": 0
+  },
+  "https://www.thepaper.cn": {
+    "status": "down",
+    "timestamp": 1757045473.2562814,
+    "consecutive_failures": 7
+  },
+  "https://36kr.com": {
+    "status": "up",
+    "timestamp": 1757045474.769899,
+    "consecutive_failures": 0
+  }
+}
