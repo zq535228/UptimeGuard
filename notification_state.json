@@ -1,73 +1,73 @@
 {
   "https://www.baidu.com": {
     "status": "up",
-    "timestamp": 1757045462.248656,
+    "timestamp": 1757045491.6622891,
     "consecutive_failures": 0
   },
   "https://www.qq.com": {
     "status": "up",
-    "timestamp": 1757045463.0943544,
+    "timestamp": 1757045492.3619623,
     "consecutive_failures": 0
   },
   "https://www.sina.com.cn": {
     "status": "up",
-    "timestamp": 1757045464.5053434,
+    "timestamp": 1757045493.086414,
     "consecutive_failures": 0
   },
   "https://www.sohu.com": {
     "status": "up",
-    "timestamp": 1757045465.8915951,
+    "timestamp": 1757045493.8701541,
     "consecutive_failures": 0
   },
   "https://www.163.com": {
     "status": "up",
-    "timestamp": 1757045466.4408956,
+    "timestamp": 1757045494.538702,
     "consecutive_failures": 0
   },
   "https://www.bilibili.com": {
     "status": "up",
-    "timestamp": 1757045467.2432117,
+    "timestamp": 1757045495.2521696,
     "consecutive_failures": 0
   },
   "https://www.zhihu.com": {
     "status": "up",
-    "timestamp": 1757045467.8740394,
+    "timestamp": 1757045495.8507476,
     "consecutive_failures": 0
   },
   "https://www.jd.com": {
     "status": "up",
-    "timestamp": 1757045468.873282,
+    "timestamp": 1757045496.863394,
     "consecutive_failures": 0
   },
   "https://www.taobao.com": {
     "status": "up",
-    "timestamp": 1757045469.5478635,
+    "timestamp": 1757045497.4536817,
     "consecutive_failures": 0
   },
   "https://cn.bing.com": {
     "status": "up",
-    "timestamp": 1757045469.8680112,
+    "timestamp": 1757045497.7683113,
     "consecutive_failures": 0
   },
   "https://www.people.com.cn": {
     "status": "up",
-    "timestamp": 1757045470.19278,
+    "timestamp": 1757045498.0317764,
     "consecutive_failures": 0
   },
   "https://www.xinhuanet.com": {
     "status": "up",
-    "timestamp": 1757045471.5399065,
+    "timestamp": 1757045499.1506407,
     "consecutive_failures": 0
   },
   "https://www.cctv.com": {
     "status": "up",
-    "timestamp": 1757045471.9135933,
+    "timestamp": 1757045499.3617806,
     "consecutive_failures": 0
   },
   "https://www.thepaper.cn": {
     "status": "down",
-    "timestamp": 1757045473.2562814,
-    "consecutive_failures": 7
+    "timestamp": 1757045500.0980637,
+    "consecutive_failures": 8
   },
   "https://36kr.com": {
     "status": "up",
