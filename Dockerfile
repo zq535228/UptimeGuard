@@ -15,8 +15,6 @@ COPY docker_utils.py .
 COPY telegram_config.py .
 COPY telegram_notifier.py .
 COPY telegram_chat_bot.py .
-COPY start_chat_bot.py .
-COPY status_check.py .
 
 # 复制配置文件和依赖
 COPY requirements.txt .
@@ -24,11 +22,6 @@ COPY sites.json .
 
 # 创建必要的目录
 RUN mkdir -p /app/logs
-
-# 设置权限
-RUN chmod +x app.py
-RUN chmod +x start_chat_bot.py
-RUN chmod +x status_check.py
 
 # 设置 Python 路径，确保可以找到当前目录的模块
 ENV PYTHONPATH=/app
