@@ -12,7 +12,7 @@ from docker_utils import is_docker_environment
 
 def main():
     # 启动后台轮询（模拟监控），默认 30s 一次
-    start_background_polling(load_sites, interval_seconds=15)
+    start_background_polling(load_sites, interval_seconds=60)
 
     # 启动 UI
     demo = build_interface()
